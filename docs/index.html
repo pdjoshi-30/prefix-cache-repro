@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prefix Caching Can Silently Break Reproducibility</title>
+<meta name="description" content="Prefix caching, on by default in vLLM and SGLang, decides whether a greedy-decoded interactive agent evaluation reproduces at all. NeurIPS 2026 Workshop on Evaluation of Interactive Agents.">
+<meta property="og:title" content="Prefix Caching Can Silently Break Reproducibility in Interactive Agent Evaluation">
+<meta property="og:description" content="0/20 tasks reproduce with the prefix cache on, 20/20 with it off, on both vLLM and SGLang. NeurIPS 2026 Workshop on Evaluation of Interactive Agents.">
+<meta property="og:image" content="assets/fig_strip.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --figure-bg: #fcfcfb;
+    --ink: #17171a;
+    --ink-2: #4a4a50;
+    --muted: #7a7a80;
+    --rule: #e4e2dc;
+    --accent: #2a78d6;
+    --accent-ink: #1f5fae;
+    --warn: #c8521f;
+    --good: #148a60;
+    --chip: #f0eee8;
+    --shadow: 0 1px 2px rgba(20,20,30,.04), 0 8px 24px rgba(20,20,30,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #141416;
+      --surface: #1c1c1f;
+      --figure-bg: #fcfcfb;
+      --ink: #f1f0ec;
+      --ink-2: #c3c2b9;
+      --muted: #8f8e88;
+      --rule: #2c2c30;
+      --accent: #5b9ef0;
+      --accent-ink: #8bbcf6;
+      --warn: #f08454;
+      --good: #3cc792;
+      --chip: #26262a;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141416;
+    --surface: #1c1c1f;
+    --figure-bg: #fcfcfb;
+    --ink: #f1f0ec;
+    --ink-2: #c3c2b9;
+    --muted: #8f8e88;
+    --rule: #2c2c30;
+    --accent: #5b9ef0;
+    --accent-ink: #8bbcf6;
+    --warn: #f08454;
+    --good: #3cc792;
+    --chip: #26262a;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 400 19px/1.65 "Newsreader", Georgia, serif;
+    font-optical-sizing: auto;
+  }
+  a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 20px; }
+  .wide { max-width: 980px; }
+
+  /* ---------- top bar ---------- */
+  .topbar { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(1.4) blur(10px);
+    background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--rule); }
+  .topbar .wrap { display: flex; align-items: center; gap: 18px; height: 52px;
+    font: 500 13.5px/1 "Inter", system-ui, sans-serif; max-width: 980px; }
+  .topbar .brand { color: var(--ink); text-decoration: none; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
+  .topbar nav { display: flex; gap: 16px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+  .topbar nav a { color: var(--ink-2); text-decoration: none; white-space: nowrap; }
+  .topbar nav a:hover { color: var(--ink); }
+  .theme-btn { border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2);
+    border-radius: 999px; width: 32px; height: 32px; cursor: pointer; display: grid; place-items: center; flex: none; }
+
+  /* ---------- hero ---------- */
+  header.hero { padding: 64px 0 28px; text-align: center; }
+  .venue { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;
+    font: 500 12.5px/1 "Inter", sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .venue .pill { background: var(--chip); border: 1px solid var(--rule); padding: 7px 11px; border-radius: 999px; }
+  .venue .pill.poster { color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent) 35%, var(--rule)); }
+  h1 { font-weight: 500; font-size: clamp(32px, 5.4vw, 52px); line-height: 1.1; letter-spacing: -.015em;
+    margin: 22px auto 22px; max-width: 900px; }
+  h1 em { font-style: italic; color: var(--warn); }
+  .authors { font-size: 20px; margin: 0 0 4px; }
+  .authors span { white-space: nowrap; }
+  .authors sup { font-size: 12px; color: var(--muted); }
+  .affil { color: var(--ink-2); font-size: 16.5px; margin: 0 0 26px; }
+  .links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px;
+    font: 500 14px/1 "Inter", sans-serif; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--rule); background: var(--surface); box-shadow: var(--shadow);
+    transition: transform .15s ease, border-color .15s ease; }
+  .btn:hover { transform: translateY(-1px); border-color: var(--ink-2); }
+  .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .btn svg { width: 16px; height: 16px; }
+
+  /* ---------- figures ---------- */
+  figure { margin: 34px 0; }
+  .frame { background: var(--figure-bg); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden;
+    box-shadow: var(--shadow); }
+  .frame img { display: block; width: 100%; height: auto; }
+  .frame.pad { padding: 14px 10px 8px; }
+  figcaption { font: 400 14.5px/1.55 "Inter", sans-serif; color: var(--ink-2); margin-top: 12px; }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- tl;dr stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 36px 0 10px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 18px 18px 16px;
+    box-shadow: var(--shadow); opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; }
+  .stat.in { opacity: 1; transform: none; }
+  .stat .num { font: 500 34px/1.05 "Newsreader", serif; letter-spacing: -.01em; }
+  .stat .num .arrow { color: var(--muted); font-size: 24px; padding: 0 4px; }
+  .stat .lab { font: 400 13.5px/1.45 "Inter", sans-serif; color: var(--ink-2); margin-top: 8px; }
+  .warn { color: var(--warn); } .acc { color: var(--accent); } .good { color: var(--good); }
+
+  /* ---------- prose ---------- */
+  section { padding: 30px 0; }
+  h2 { font: 600 13px/1 "Inter", sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+    margin: 0 0 10px; display: flex; align-items: center; gap: 12px; }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  h3 { font-weight: 500; font-size: 28px; line-height: 1.2; letter-spacing: -.01em; margin: 6px 0 14px; }
+  p { margin: 0 0 16px; }
+  .abstract { font-size: 18.5px; color: var(--ink); }
+  .lede { font-size: 21px; line-height: 1.55; }
+  code, .mono { font: 400 .82em "JetBrains Mono", ui-monospace, monospace; background: var(--chip);
+    padding: 2px 6px; border-radius: 5px; }
+
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); }
+  .card .k { font: 600 12px/1.35 "Inter", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .card .t { font-size: 19px; font-weight: 500; margin: 8px 0 6px; line-height: 1.3; }
+  .card p { font: 400 14.5px/1.55 "Inter", sans-serif; color: var(--ink-2); margin: 0; }
+
+  table { width: 100%; border-collapse: collapse; font: 400 14.5px/1.4 "Inter", sans-serif; margin: 6px 0 4px; }
+  th, td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { font-weight: 600; color: var(--ink-2); font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; }
+  .tables { display: grid; grid-template-columns: 1.35fr 1fr; gap: 22px; }
+  .tcap { font: 400 13.5px/1.5 "Inter", sans-serif; color: var(--ink-2); margin-top: 8px; }
+  .neg { color: var(--warn); font-weight: 600; }
+
+  .checklist { list-style: none; padding: 0; margin: 14px 0; display: grid; gap: 10px; }
+  .checklist li { display: flex; gap: 12px; align-items: flex-start; background: var(--surface);
+    border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; font: 400 15.5px/1.5 "Inter", sans-serif; }
+  .checklist li svg { flex: none; margin-top: 2px; color: var(--accent); }
+  .checklist li.new { border-color: color-mix(in srgb, var(--accent) 45%, var(--rule)); }
+  .checklist .tag { font: 600 11px/1 "Inter", sans-serif; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent-ink); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 4px 7px; border-radius: 6px; margin-left: 6px; white-space: nowrap; }
+
+  .limits { font: 400 15.5px/1.6 "Inter", sans-serif; color: var(--ink-2); padding-left: 20px; }
+  .limits li { margin-bottom: 6px; }
+
+  .bib { position: relative; background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; }
+  .bib pre { margin: 0; padding: 18px 20px; overflow-x: auto; font: 400 13.5px/1.6 "JetBrains Mono", monospace; color: var(--ink); }
+  .copy { position: absolute; top: 10px; right: 10px; font: 500 12.5px/1 "Inter", sans-serif; border: 1px solid var(--rule);
+    background: var(--bg); color: var(--ink-2); padding: 7px 10px; border-radius: 8px; cursor: pointer; }
+
+  .note { font: 400 15px/1.6 "Inter", sans-serif; color: var(--ink-2); background: var(--surface);
+    border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 10px; padding: 14px 16px; }
+
+  footer { border-top: 1px solid var(--rule); margin-top: 40px; padding: 26px 0 50px;
+    font: 400 13.5px/1.6 "Inter", sans-serif; color: var(--muted); }
+
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .stat { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  @media (max-width: 760px) {
+    body { font-size: 18px; }
+    .stats, .cards3, .tables { grid-template-columns: 1fr; }
+    header.hero { padding-top: 40px; }
+    .topbar nav { display: none; }
+    .topbar .brand { overflow: hidden; text-overflow: ellipsis; }
+    .theme-btn { margin-left: auto; }
+    h3 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">Prefix caching &amp; reproducibility</a>
+    <nav aria-label="Sections">
+      <a href="#abstract">Abstract</a>
+      <a href="#finding">Finding</a>
+      <a href="#results">Results</a>
+      <a href="#report">What to report</a>
+      <a href="#bibtex">BibTeX</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</div>
+
+<main id="top">
+  <header class="hero wrap wide">
+    <div class="venue">
+      <span class="pill">NeurIPS 2026 Workshop</span>
+      <span class="pill">Evaluation of Interactive Agents</span>
+      <span class="pill poster">Poster</span>
+    </div>
+    <h1>Prefix Caching Can <em>Silently</em> Break Reproducibility in Interactive Agent Evaluation</h1>
+    <p class="authors">
+      <span>Prathamesh Dinesh Joshi</span> &middot;
+      <span>Raj Abhijit Dandekar</span> &middot;
+      <span>Rajat Dandekar</span> &middot;
+      <span>Sreedath Panat</span>
+    </p>
+    <p class="affil">Vizuara AI Labs, Pune, India</p>
+    <div class="links">
+      <a class="btn primary" href="https://openreview.net/pdf?id=JKNkGx1whd">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Paper</a>
+      <a class="btn" href="https://openreview.net/forum?id=JKNkGx1whd">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>OpenReview</a>
+      <a class="btn" href="https://github.com/pdjoshi-30/prefix-cache-repro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Code &amp; data</a>
+      <a class="btn" href="#bibtex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>BibTeX</a>
+    </div>
+  </header>
+
+  <div class="wrap wide">
+    <figure class="reveal">
+      <div class="frame"><img src="assets/replicates.gif" width="720" height="330"
+        alt="Animation: five greedy replicates of one airline task are read out message by message. With the prefix cache on, all five runs disagree from message 1, the simulated user's opening line. With it off, all five runs are identical."></div>
+      <figcaption><b>The finding in one picture.</b> Both models decode greedily, yet with the prefix cache
+        on (the engine default) replicates split at message&nbsp;1, the simulated user's opening utterance,
+        before any dialogue exists to compound small errors. Turning the cache off makes every run identical.
+        Schematic of the readout in the paper's Fig.&nbsp;1c.</figcaption>
+    </figure>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="num warn">0 / 50</div>
+        <div class="lab">airline tasks reproduce exactly across five greedy runs on a default deployment (retail: also 0&nbsp;/&nbsp;50)</div></div>
+      <div class="stat"><div class="num"><span class="warn">0</span><span class="arrow">&rarr;</span><span class="acc">20 / 20</span></div>
+        <div class="lab">matched airline tasks reproduce when only the prefix cache is turned off, on both vLLM and SGLang</div></div>
+      <div class="stat"><div class="num warn">76&ndash;84%</div>
+        <div class="lab">of the transcript divergences never change the reward, so the reported score hides them</div></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section id="abstract" class="reveal">
+      <h2>Abstract</h2>
+      <p class="abstract">Interactive agents are scored by holding a conversation with a simulated user, so the
+      resulting score can reflect variation from the agent, the simulator, the environment and the grader. We
+      identify an additional source of variation at the serving layer. With both conversational models decoded
+      greedily, 0 of 50 &tau;<sup>2</sup>-bench airline tasks and 0 of 50 retail tasks were fully reproducible across
+      five replicates, and divergence usually began in the first generated message rather than accumulating over a
+      long dialogue. In a matched 2&nbsp;&times;&nbsp;2 study over two engines and two cache settings, prefix-cache
+      status predicted transcript repeatability exactly: 0 of 20 airline tasks reproduced with caching on, 20 of 20
+      with it off, on both vLLM and SGLang. Across matched cache-off arms, airline (20/20), retail (20/20) and
+      telecom (11/11) reproduced exactly; banking improved from 4/19 to 7/19, with all 12 residual divergences first
+      appearing at environment tool results, which localises what remains to the environment path without
+      separating its language-model interface from retrieval tie-breaking. The benchmark's reward metric hides
+      76&ndash;84% of these transcript divergences, which helps explain why the problem may go unnoticed. At two
+      replicates per task, the estimated ordering of the variance components remains unstable. These results
+      indicate that cache state should be reported alongside temperature and model version.</p>
+    </section>
+
+    <section id="finding" class="reveal">
+      <h2>The finding</h2>
+      <h3>A hidden state variable under every episode</h3>
+      <p class="lede">The plan was a temperature factorial to separate agent noise from simulator noise. Its
+      control condition, both models greedy, was expected to be a near-zero floor. It was not near zero. Nothing
+      reproduced, and divergence started at the very first generated message.</p>
+      <p>The cause turned out not to be the models. <em>Prefix caching</em> reuses attention state for a prompt
+      prefix that an earlier request already computed. It is meant to be a semantics-preserving throughput
+      optimisation and is on by default in both serving stacks we tried: vLLM ships it as automatic prefix
+      caching, SGLang as RadixAttention. It is mutable, shared, cross-request state sitting under a measurement
+      that is usually drawn as if episodes were independent.</p>
+      <div class="cards3">
+        <div class="card"><div class="k">(a) What a score is made of</div>
+          <div class="t">Two language models and an environment</div>
+          <p>A task, a conversation between an agent and a user simulator, tool calls into a database, and a judge.
+            Existing work measures their summed noise or apportions it among these four.</p></div>
+        <div class="card"><div class="k">(b) The omitted variable</div>
+          <div class="t">A prefix cache, on by default</div>
+          <p>Both models are served by processes that keep state between requests, so what ran before can enter
+            the computation of what runs next. Weights and decoding settings stay fixed.</p></div>
+        <div class="card"><div class="k">(c) The readout</div>
+          <div class="t">Transcript identity, not reward</div>
+          <p>Run each task <i>R</i> times and compare transcripts message by message on role, text and tool call.
+            A truncated transcript counts as divergence.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap wide">
+    <section id="results">
+      <h2>Results</h2>
+
+      <figure class="reveal">
+        <div class="frame"><img src="assets/matrix.gif" width="720" height="440" loading="lazy"
+          alt="Animation of the engine by cache 2x2 on 20 matched airline tasks: with the prefix cache on, 0 of 20 tasks reproduce on vLLM and on SGLang; with it off, 20 of 20 reproduce on both."></div>
+        <figcaption><b>The prefix-cache setting is the operative factor.</b> Same 20 airline tasks, same weights,
+          temperature 0, one request in flight. Cache status, not engine identity, predicts repeatability:
+          0/20 with it on and 20/20 with it off, on two independently implemented caches. The first version of
+          this comparison varied engine and cache together. The completed 2&nbsp;&times;&nbsp;2 withdrew the engine
+          reading (paper, Appendix&nbsp;C).</figcaption>
+      </figure>
+
+      <figure class="reveal">
+        <div class="frame"><img src="assets/domains.gif" width="720" height="380" loading="lazy"
+          alt="Animation of the same flag in four domains: airline 0/20 to 20/20, retail 0/20 to 20/20, telecom 1/11 to 11/11, banking 4/19 to 7/19."></div>
+        <figcaption><b>The fix reaches the models, not the environment.</b> Turning the cache off restores exact
+          repeatability in airline, retail and telecom. Banking improves and stops. All 12 of its remaining first
+          divergences occur at a tool result, none at either model. Banking is the only domain whose
+          environment interface is itself a language model over lexical retrieval.</figcaption>
+      </figure>
+
+      <figure class="reveal">
+        <div class="frame pad"><img src="assets/fig_strip.png" width="1600" loading="lazy"
+          alt="Paper Figure 2: message index of the first divergence for every task, coloured by role. Under a default deployment most divergences sit at index 1, the simulated user's opening utterance."></div>
+        <figcaption><b>Where the first divergence lands</b> (paper Fig.&nbsp;2). One point per task, coloured by whose
+          turn it was. On airline 40 of 50 tasks first diverge at index&nbsp;1, on retail 42 of 50. Three airline
+          tasks produced five <i>distinct</i> opening utterances across five greedy replicates.</figcaption>
+      </figure>
+
+      <figure class="reveal">
+        <div class="frame"><img src="assets/conceal.gif" width="720" height="300" loading="lazy"
+          alt="Animation: all 50 airline tasks diverge at the transcript level, but only 12 change reward; 38 diverge invisibly to the score."></div>
+        <figcaption><b>Why reward-level analyses missed this.</b> Reward is a coarse, usually binary function of a
+          long trajectory, so two runs can take different paths and land on the same outcome. That doesn't make
+          the divergence harmless: the five single-run airline pass rates under greedy decoding were 20, 16, 16, 14
+          and 14%, a 6-point spread from a nominally deterministic configuration. Square positions are
+          illustrative.</figcaption>
+      </figure>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="reveal">
+      <h2>What replication costs</h2>
+      <h3>Two replicates cannot order the components</h3>
+      <p>On a default deployment the residual infrastructure term is the <em>largest</em> of the three:
+      <span class="mono">V&#770;<sub>infra</sub> = 0.058</span> [0.030, 0.090], ahead of the simulator (0.044) and
+      the agent (0.040). Across all ten ways of choosing two replicates from five, the simulator term is larger in
+      four, the agent term in four, and they tie in two.</p>
+      <div class="tables">
+        <div>
+          <table>
+            <thead><tr><th>R</th><th>V&#770;<sub>infra</sub></th><th>V&#770;<sub>sim</sub></th><th>V&#770;<sub>agent</sub></th><th>CI width</th></tr></thead>
+            <tbody>
+              <tr><td>2</td><td>0.040</td><td>0.090</td><td class="neg">&minus;0.010</td><td>0.140</td></tr>
+              <tr><td>3</td><td>0.060</td><td>0.060</td><td>0.013</td><td>0.073</td></tr>
+              <tr><td>4</td><td>0.065</td><td>0.050</td><td>0.023</td><td>0.065</td></tr>
+              <tr><td>5</td><td>0.058</td><td>0.044</td><td>0.040</td><td>0.058</td></tr>
+            </tbody>
+          </table>
+          <div class="tcap">Components by replicate count, airline (paper Table&nbsp;4). The R&nbsp;=&nbsp;2 row is one of ten
+            possible pairs.</div>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th>Cond.</th><th>agent, sim T</th><th>ICC</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td>0, 0</td><td>0.574</td></tr>
+              <tr><td>B</td><td>0, 1</td><td>0.387</td></tr>
+              <tr><td>C</td><td>1, 0</td><td>0.318</td></tr>
+              <tr><td>D</td><td>1, 1</td><td>0.202</td></tr>
+            </tbody>
+          </table>
+          <div class="tcap">Between-task share of variance (paper Table&nbsp;5). By condition&nbsp;D most of the variance
+            no longer separates tasks.</div>
+        </div>
+      </div>
+      <p class="tcap" style="margin-top:14px">Both tables were computed on the default cache-on deployment.</p>
+    </section>
+
+    <section id="report" class="reveal">
+      <h2>What to report</h2>
+      <h3>Cache state belongs next to temperature and model version</h3>
+      <ul class="checklist">
+        <li class="new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>The prefix- or radix-cache setting of the serving stack<span class="tag">new</span></span></li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Model version and decoding temperature</span></li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>The number of replicates per task</span></li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>The retry policy for failed episodes (&tau;<sup>2</sup>-bench retries up to three times by default, which hides unlucky rollouts)</span></li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Whether any part of the environment or grader is a language model</span></li>
+      </ul>
+      <p>Disabling prefix caching (<code>--no-enable-prefix-caching</code> in vLLM, <code>--disable-radix-cache</code>
+      in SGLang) is the remedy evaluated here, though it may not be the most efficient one. Transcript identity is
+      cheap to compute, a comparison over runs already performed, and in these experiments it was much more
+      sensitive than reward.</p>
+    </section>
+
+    <section class="reveal">
+      <h2>Limitations</h2>
+      <ul class="limits">
+        <li>One benchmark (&tau;<sup>2</sup>-bench). The mechanism study uses one agent&ndash;simulator pair, 20 tasks and 3 replicates.</li>
+        <li>The design establishes the causal role of the flag, not the arithmetic behind it. Cache hits, evictions and kernel changes were not traced.</li>
+        <li>Banking's residual is not separated between its language-model interface and retrieval tie-breaking.</li>
+        <li>Conditions B, C and D were not re-run with caching disabled. Telecom evidence is weaker (11 matched tasks). Throughput cost was not measured.</li>
+      </ul>
+    </section>
+
+    <section id="bibtex" class="reveal">
+      <h2>BibTeX</h2>
+      <div class="bib">
+        <button class="copy" id="copyBtn" type="button">Copy</button>
+<pre id="bibText">@inproceedings{joshi2026prefix,
+  title     = {Prefix Caching Can Silently Break Reproducibility
+               in Interactive Agent Evaluation},
+  author    = {Prathamesh Dinesh Joshi and Raj Dandekar and
+               Rajat Dandekar and Sreedath Panat},
+  booktitle = {Workshop on Evaluation of Interactive Agents @ NeurIPS 2026},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=JKNkGx1whd}
+}</pre>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="note"><b>Ongoing work.</b> We are continuing this line of work. This page and the
+        <a href="https://github.com/pdjoshi-30/prefix-cache-repro">repository</a> may be updated as new results become available.</div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    Vizuara AI Labs &middot; NeurIPS 2026 Workshop on Evaluation of Interactive Agents &middot;
+    <a href="https://openreview.net/forum?id=JKNkGx1whd">OpenReview</a> &middot;
+    <a href="https://github.com/pdjoshi-30/prefix-cache-repro">GitHub</a>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  try { const t = localStorage.getItem("theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  document.getElementById("themeBtn").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  document.querySelectorAll(".stat").forEach((el, i) => {
+    el.style.transitionDelay = (i * 120) + "ms"; io.observe(el);
+  });
+
+  const btn = document.getElementById("copyBtn");
+  btn.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(document.getElementById("bibText").innerText); btn.textContent = "Copied"; }
+    catch (e) { btn.textContent = "Select & copy"; }
+    setTimeout(() => (btn.textContent = "Copy"), 1600);
+  });
+})();
+</script>
+</body>
+</html>

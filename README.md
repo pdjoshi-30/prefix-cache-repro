@@ -2,12 +2,13 @@
 
 **Prathamesh Dinesh Joshi, Raj Abhijit Dandekar, Rajat Dandekar, Sreedath Panat** · Vizuara AI Labs
 
-Accepted at the [Workshop on Evaluation of Interactive Agents](https://eval-interactive-agents-workshop.github.io/) @ NeurIPS 2026.
+Accepted as a **poster** at the [Workshop on Evaluation of Interactive Agents](https://eval-interactive-agents-workshop.github.io/) @ NeurIPS 2026.
 
 | | |
 |---|---|
-| **Camera-ready PDF** | *coming soon* |
-| **OpenReview** | *coming soon* |
+| **Project page** | https://pdjoshi-30.github.io/prefix-cache-repro/ |
+| **Paper (PDF)** | [openreview.net/pdf?id=JKNkGx1whd](https://openreview.net/pdf?id=JKNkGx1whd) |
+| **OpenReview** | [openreview.net/forum?id=JKNkGx1whd](https://openreview.net/forum?id=JKNkGx1whd) (IAEval 2026 Poster) |
 | **Benchmark** | [τ²-bench](https://github.com/sierra-research/tau2-bench) at commit `363133a` (`v1.0.1-17`) |
 | **Engines** | vLLM `0.11.0` (V1) and SGLang `0.5.2` |
 
@@ -174,6 +175,7 @@ scripts/         04_divergence.py       transcript identity and first divergence
                  14_review_response.py  R = 2 pair enumeration, single-run pass rates (§4.4–4.5)
 experiments/     one directory per arm (see below)
 paper/figures/   figures as they appear in the paper
+docs/            project page (GitHub Pages); scripts/make_site_gifs.py renders its GIFs
 tests/           estimator tests
 ```
 
@@ -213,11 +215,12 @@ python scripts/14_review_response.py
 ## Citation
 
 ```bibtex
-@inproceedings{joshi2026prefixcache,
+@inproceedings{joshi2026prefix,
   title     = {Prefix Caching Can Silently Break Reproducibility in Interactive Agent Evaluation},
-  author    = {Joshi, Prathamesh Dinesh and Dandekar, Raj Abhijit and Dandekar, Rajat and Panat, Sreedath},
-  booktitle = {Workshop on Evaluation of Interactive Agents at NeurIPS 2026},
-  year      = {2026}
+  author    = {Prathamesh Dinesh Joshi and Raj Dandekar and Rajat Dandekar and Sreedath Panat},
+  booktitle = {Workshop on Evaluation of Interactive Agents @ NeurIPS 2026},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=JKNkGx1whd}
 }
 ```
 
