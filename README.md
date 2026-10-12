@@ -225,3 +225,10 @@ python scripts/14_review_response.py
 
 τ²-bench: MIT. vLLM, SGLang: Apache 2.0. Qwen3 and Mistral checkpoints: Apache 2.0.
 Hermes-3-Llama-3.1-8B: Llama 3 license. `gemma-3-12b-it`: Gemma Terms of Use.
+
+---
+
+## Ongoing work
+
+We are continuing this line of work. This repository may be updated as new results become
+available.
