@@ -1,0 +1,52 @@
+{
+  "run": "E1b",
+  "domain": "airline",
+  "conditions": {
+    "A": {
+      "n_obs": 250,
+      "n_tasks": 50,
+      "between_task_var_tau2": 0.0782,
+      "within_task_var_residual": 0.058,
+      "pooled_within_task_primary": 0.058,
+      "abs_diff_vs_primary": 0.0,
+      "icc": 0.5741
+    },
+    "B": {
+      "n_obs": 250,
+      "n_tasks": 50,
+      "between_task_var_tau2": 0.06443,
+      "within_task_var_residual": 0.102,
+      "pooled_within_task_primary": 0.102,
+      "abs_diff_vs_primary": 0.0,
+      "icc": 0.3871
+    },
+    "C": {
+      "n_obs": 250,
+      "n_tasks": 50,
+      "between_task_var_tau2": 0.04572,
+      "within_task_var_residual": 0.098,
+      "pooled_within_task_primary": 0.098,
+      "abs_diff_vs_primary": 0.0,
+      "icc": 0.3181
+    },
+    "D": {
+      "n_obs": 250,
+      "n_tasks": 50,
+      "between_task_var_tau2": 0.02738,
+      "within_task_var_residual": 0.108,
+      "pooled_within_task_primary": 0.108,
+      "abs_diff_vs_primary": 0.0,
+      "icc": 0.2022
+    }
+  },
+  "primary_components": {
+    "v_infra": 0.058,
+    "v_sim": 0.044,
+    "v_agent": 0.04
+  },
+  "hierarchical_components": {
+    "v_infra": 0.058,
+    "v_sim": 0.044,
+    "v_agent": 0.04
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "run_id": "E4t2",
+  "condition": "A",
+  "task_id": "[mms_issue]bad_network_preference|bad_wifi_calling|break_app_sms_permission|data_mode_off|unseat_sim_card|user_abroad_roaming_enabled_off[PERSONA:Hard]",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 318,
+  "seconds": 168.65,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 32,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 158.61874506700008,
+  "actual_seed": 732574
+}

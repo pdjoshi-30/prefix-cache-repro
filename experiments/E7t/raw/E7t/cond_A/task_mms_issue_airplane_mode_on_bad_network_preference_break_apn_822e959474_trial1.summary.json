@@ -1,0 +1,18 @@
+{
+  "run_id": "E7t",
+  "condition": "A",
+  "task_id": "[mms_issue]airplane_mode_on|bad_network_preference|break_apn_mms_setting|data_mode_off|unseat_sim_card|user_abroad_roaming_disabled_off[PERSONA:Easy]",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1312,
+  "seconds": 33.95,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 20,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 26.903466380000282,
+  "actual_seed": 583521
+}

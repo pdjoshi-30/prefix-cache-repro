@@ -1,0 +1,50 @@
+{
+  "run": "E1b",
+  "domain": "airline",
+  "allocation": [
+    {
+      "R": 2,
+      "n_tasks": 50,
+      "v_infra": 0.04,
+      "v_sim": 0.09,
+      "v_agent": -0.01,
+      "ci_width_v_sim": 0.14,
+      "ci_width_v_agent": 0.1,
+      "v_sim_excludes_zero": true,
+      "cost_relative": 0.4
+    },
+    {
+      "R": 3,
+      "n_tasks": 50,
+      "v_infra": 0.06,
+      "v_sim": 0.06,
+      "v_agent": 0.0133,
+      "ci_width_v_sim": 0.0733,
+      "ci_width_v_agent": 0.08,
+      "v_sim_excludes_zero": true,
+      "cost_relative": 0.6
+    },
+    {
+      "R": 4,
+      "n_tasks": 50,
+      "v_infra": 0.065,
+      "v_sim": 0.05,
+      "v_agent": 0.0233,
+      "ci_width_v_sim": 0.065,
+      "ci_width_v_agent": 0.0733,
+      "v_sim_excludes_zero": true,
+      "cost_relative": 0.8
+    },
+    {
+      "R": 5,
+      "n_tasks": 50,
+      "v_infra": 0.058,
+      "v_sim": 0.044,
+      "v_agent": 0.04,
+      "ci_width_v_sim": 0.058,
+      "ci_width_v_agent": 0.056,
+      "v_sim_excludes_zero": true,
+      "cost_relative": 1.0
+    }
+  ]
+}

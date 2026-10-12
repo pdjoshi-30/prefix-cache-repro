@@ -1,0 +1,18 @@
+{
+  "run_id": "E12r_retail_nocache",
+  "condition": "A",
+  "task_id": "24",
+  "trial": 2,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 2319,
+  "seconds": 46.67,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 10,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 29.352720897999916,
+  "actual_seed": 129348
+}

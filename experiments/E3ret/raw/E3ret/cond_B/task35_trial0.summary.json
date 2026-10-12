@@ -1,0 +1,18 @@
+{
+  "run_id": "E3ret",
+  "condition": "B",
+  "task_id": "35",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 1.0,
+  "seed": 326,
+  "seconds": 15.4,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 2,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 7.08523045700008,
+  "actual_seed": 109516
+}

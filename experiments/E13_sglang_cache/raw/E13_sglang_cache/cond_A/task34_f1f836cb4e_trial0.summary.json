@@ -1,0 +1,18 @@
+{
+  "run_id": "E13_sglang_cache",
+  "condition": "A",
+  "task_id": "34",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 319,
+  "seconds": 77.88,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 28,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 67.75152695000003,
+  "actual_seed": 186580
+}

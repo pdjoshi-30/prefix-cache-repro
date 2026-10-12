@@ -1,0 +1,18 @@
+{
+  "run_id": "E7a",
+  "condition": "A",
+  "task_id": "5",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1304,
+  "seconds": 24.09,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 1.0,
+  "n_messages": 7,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 10.427360774999954,
+  "actual_seed": 416180
+}

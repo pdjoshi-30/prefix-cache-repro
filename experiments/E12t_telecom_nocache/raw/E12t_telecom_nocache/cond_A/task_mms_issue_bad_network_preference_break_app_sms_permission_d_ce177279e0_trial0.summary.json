@@ -1,0 +1,18 @@
+{
+  "run_id": "E12t_telecom_nocache",
+  "condition": "A",
+  "task_id": "[mms_issue]bad_network_preference|break_app_sms_permission|data_mode_off|data_usage_exceeded|user_abroad_roaming_enabled_off[PERSONA:None]",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 319,
+  "seconds": 31.29,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 2,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 20.87642744499999,
+  "actual_seed": 186580
+}

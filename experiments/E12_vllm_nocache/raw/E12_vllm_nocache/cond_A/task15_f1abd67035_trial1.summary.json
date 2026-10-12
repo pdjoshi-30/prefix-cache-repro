@@ -1,0 +1,18 @@
+{
+  "run_id": "E12_vllm_nocache",
+  "condition": "A",
+  "task_id": "15",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1311,
+  "seconds": 146.28,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 30,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 138.45982603599998,
+  "actual_seed": 151966
+}

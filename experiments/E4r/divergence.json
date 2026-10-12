@@ -1,0 +1,10 @@
+{
+  "A": {
+    "n_tasks": 0,
+    "identical": 0,
+    "diverged": 0,
+    "divergence_rate": null,
+    "first_divergence_by_role": {},
+    "median_normalised_position": null
+  }
+}

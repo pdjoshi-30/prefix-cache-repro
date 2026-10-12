@@ -1,0 +1,18 @@
+{
+  "run_id": "E12b_banking_nocache",
+  "condition": "A",
+  "task_id": "task_005",
+  "trial": 2,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 2304,
+  "seconds": 27.89,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 2,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 20.031029654999884,
+  "actual_seed": 581025
+}

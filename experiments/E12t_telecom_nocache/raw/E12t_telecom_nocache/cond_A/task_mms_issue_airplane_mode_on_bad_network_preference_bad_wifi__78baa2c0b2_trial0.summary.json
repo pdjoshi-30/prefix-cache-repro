@@ -1,0 +1,18 @@
+{
+  "run_id": "E12t_telecom_nocache",
+  "condition": "A",
+  "task_id": "[mms_issue]airplane_mode_on|bad_network_preference|bad_wifi_calling|break_app_storage_permission|unseat_sim_card[PERSONA:Hard]",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 308,
+  "seconds": 139.35,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 31,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 123.89020439199999,
+  "actual_seed": 196483
+}

@@ -1,0 +1,18 @@
+{
+  "run_id": "E8r",
+  "condition": "A",
+  "task_id": "24",
+  "trial": 2,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 2319,
+  "seconds": 57.42,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 32,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 50.88308067600019,
+  "actual_seed": 129348
+}

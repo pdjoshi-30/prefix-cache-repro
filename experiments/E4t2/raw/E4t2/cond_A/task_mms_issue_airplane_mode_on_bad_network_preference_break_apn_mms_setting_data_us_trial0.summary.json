@@ -1,0 +1,18 @@
+{
+  "run_id": "E4t2",
+  "condition": "A",
+  "task_id": "[mms_issue]airplane_mode_on|bad_network_preference|break_apn_mms_setting|data_usage_exceeded[PERSONA:Hard]",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 313,
+  "seconds": 143.26,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 31,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 134.73198788000002,
+  "actual_seed": 592029
+}

@@ -1,0 +1,62 @@
+{
+  "A": {
+    "n_tasks": 50,
+    "identical": 0,
+    "diverged": 50,
+    "divergence_rate": 1.0,
+    "first_divergence_by_role": {
+      "assistant": {
+        "n": 7,
+        "median_index": 4
+      },
+      "user": {
+        "n": 43,
+        "median_index": 1
+      }
+    },
+    "median_normalised_position": 0.0323
+  },
+  "B": {
+    "n_tasks": 50,
+    "identical": 0,
+    "diverged": 50,
+    "divergence_rate": 1.0,
+    "first_divergence_by_role": {
+      "user": {
+        "n": 50,
+        "median_index": 1
+      }
+    },
+    "median_normalised_position": 0.0323
+  },
+  "C": {
+    "n_tasks": 50,
+    "identical": 0,
+    "diverged": 50,
+    "divergence_rate": 1.0,
+    "first_divergence_by_role": {
+      "assistant": {
+        "n": 11,
+        "median_index": 4
+      },
+      "user": {
+        "n": 39,
+        "median_index": 1
+      }
+    },
+    "median_normalised_position": 0.0323
+  },
+  "D": {
+    "n_tasks": 50,
+    "identical": 0,
+    "diverged": 50,
+    "divergence_rate": 1.0,
+    "first_divergence_by_role": {
+      "user": {
+        "n": 50,
+        "median_index": 1
+      }
+    },
+    "median_normalised_position": 0.0323
+  }
+}

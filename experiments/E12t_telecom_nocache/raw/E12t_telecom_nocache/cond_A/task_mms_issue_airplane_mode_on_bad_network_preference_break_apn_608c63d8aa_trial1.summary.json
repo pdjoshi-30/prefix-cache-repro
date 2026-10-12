@@ -1,0 +1,18 @@
+{
+  "run_id": "E12t_telecom_nocache",
+  "condition": "A",
+  "task_id": "[mms_issue]airplane_mode_on|bad_network_preference|break_apn_mms_setting|break_app_storage_permission[PERSONA:None]",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1311,
+  "seconds": 98.51,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 31,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 90.55211016200008,
+  "actual_seed": 151966
+}

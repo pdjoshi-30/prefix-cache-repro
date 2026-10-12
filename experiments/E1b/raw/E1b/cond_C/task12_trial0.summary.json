@@ -1,0 +1,18 @@
+{
+  "run_id": "E1b",
+  "condition": "C",
+  "task_id": 12,
+  "trial": 0,
+  "agent_temp": 1.0,
+  "sim_temp": 0.0,
+  "seed": 312,
+  "seconds": 26.74,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 14,
+  "termination": "user_stop",
+  "error": null,
+  "sim_duration": 20.053909397999973,
+  "actual_seed": 681980
+}

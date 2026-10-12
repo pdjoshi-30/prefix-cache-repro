@@ -1,0 +1,18 @@
+{
+  "run_id": "E5t2",
+  "condition": "A",
+  "task_id": "[mms_issue]bad_network_preference|break_app_sms_permission|data_mode_off|data_usage_exceeded|user_abroad_roaming_enabled_off[PERSONA:None]",
+  "trial": 2,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 2319,
+  "seconds": 97.27,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 32,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 89.86429198400003,
+  "actual_seed": 129348
+}

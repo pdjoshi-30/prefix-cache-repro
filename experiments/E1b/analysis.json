@@ -1,0 +1,55 @@
+{
+  "run_id": "E1b",
+  "generated": "2026-08-05T12:57:38+00:00",
+  "n_cells": 1000,
+  "n_usable": 1000,
+  "n_errored": 0,
+  "unreliable_conditions": [],
+  "components": {
+    "v_infra": 0.05800000000000001,
+    "v_sim": 0.044,
+    "v_agent": 0.04000000000000002,
+    "v_total": 0.10800000000000003,
+    "v_interaction": -0.034,
+    "n_tasks": {
+      "A": 50,
+      "B": 50,
+      "C": 50,
+      "D": 50
+    },
+    "n_obs": {
+      "A": 250,
+      "B": 250,
+      "C": 250,
+      "D": 250
+    },
+    "notes": [
+      "V_interaction is negative -- component likely near zero, subtraction noise-dominated",
+      "condition A variance is 0.058000 > 0 -- infrastructure is NOT deterministic under concurrency, despite temperature 0"
+    ]
+  },
+  "bootstrap_ci": {
+    "v_infra": [
+      0.030000000000000006,
+      0.09000000000000002
+    ],
+    "v_sim": [
+      0.016,
+      0.07400000000000001
+    ],
+    "v_agent": [
+      0.013999999999999999,
+      0.06999999999999999
+    ],
+    "v_total": [
+      0.07200000000000001,
+      0.14400000000000002
+    ],
+    "v_interaction": [
+      -0.07400000000000001,
+      0.0040000000000000036
+    ]
+  },
+  "billed_usd_today_project": 17.480299300000002,
+  "usd_per_conversation": 0.017480299300000002
+}

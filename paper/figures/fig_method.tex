@@ -1,0 +1,169 @@
+% Methodology diagram. Included by paper_iae.tex; iterate standalone via
+% figures/fig_method_standalone.tex.
+%
+% Canvas is 140mm x 60mm = 5.51in, i.e. exactly the NeurIPS text block, so the
+% figure is included at natural size and the type inside keeps its intended
+% point size instead of being scaled down by \includegraphics.
+%
+% Every font size is set with \fontsize{}{}\selectfont rather than \small or
+% \scriptsize: those are relative to the *document* base size, so the same file
+% rendered at 10pt standalone and inside the paper would disagree.
+%
+% Palette matches scripts/11_paper_figures.py so the figures read as one set.
+% Orange is reserved for the prefix cache and everything downstream of it.
+% Nothing here encodes a result; the only numbers are design parameters.
+\begingroup
+\sffamily
+\definecolor{fmBlue}{HTML}{2a78d6}
+\definecolor{fmOrange}{HTML}{eb6834}
+\definecolor{fmAqua}{HTML}{1baf7a}
+\definecolor{fmInk}{HTML}{0b0b0b}
+\definecolor{fmInk2}{HTML}{52514e}
+\definecolor{fmGrid}{HTML}{d9d8d5}
+\definecolor{fmWash}{HTML}{f5f6f8}
+\definecolor{fmWarmWash}{HTML}{fdf0ea}
+
+\begin{tikzpicture}[
+  x=1mm, y=1mm,
+  every node/.style   = {inner sep=0pt},
+  box/.style          = {draw=fmGrid, fill=white, rounded corners=0.6mm,
+                         line width=0.4pt, align=center, text=fmInk,
+                         font=\fontsize{6.2}{7.2}\selectfont\sffamily},
+  model/.style        = {box, draw=fmBlue!60, fill=fmBlue!8},
+  envb/.style         = {box, draw=fmAqua!65, fill=fmAqua!8},
+  cachebox/.style     = {box, draw=fmOrange, fill=fmWarmWash, line width=0.7pt},
+  quiet/.style        = {box, draw=fmGrid, fill=fmWash},
+  panel/.style        = {draw=fmGrid, fill=fmWash, rounded corners=1mm, line width=0.4pt},
+  frame/.style        = {draw=fmInk2!40, fill=white, rounded corners=1mm, line width=0.5pt},
+  flow/.style         = {-{Stealth[length=1.4mm,width=1.2mm]}, draw=fmInk2, line width=0.45pt},
+  biflow/.style       = {{Stealth[length=1.4mm,width=1.2mm]}-{Stealth[length=1.4mm,width=1.2mm]},
+                         draw=fmInk2, line width=0.45pt},
+  dep/.style          = {-{Stealth[length=1.4mm,width=1.2mm]}, draw=fmOrange,
+                         line width=0.5pt, dash pattern=on 0.9mm off 0.6mm},
+  hdr/.style          = {text=fmInk, anchor=west,
+                         font=\fontsize{7.2}{8}\selectfont\sffamily\bfseries},
+  sub/.style          = {text=fmInk2, anchor=north west, align=left,
+                         font=\fontsize{5.5}{6.5}\selectfont\sffamily},
+  note/.style         = {text=fmInk2, align=center,
+                         font=\fontsize{5.3}{6.2}\selectfont\sffamily},
+]
+\newcommand{\tin}[1]{{\fontsize{5}{5.8}\selectfont\sffamily #1}}
+
+% Pin the bounding box to exactly 140mm = 5.51in, the NeurIPS text width, so the
+% figure is placed at natural size and never scaled.
+\path[use as bounding box, clip] (-0.6,-8) rectangle (138.6,60);
+
+% ---- column rules -------------------------------------------------------
+\draw[fmGrid, line width=0.4pt] (44,2) -- (44,55);
+\draw[fmGrid, line width=0.4pt] (96.5,2) -- (96.5,55);
+
+% ======================================================================== (a)
+\node[hdr] at (0,57.5) {(a) what a score is made of};
+\node[sub, text width=40mm] at (0,54) {one $\tau^2$-bench episode: a task, a
+  conversation between two language models, a reward};
+
+\node[box, minimum width=25mm, minimum height=5.4mm] (task) at (13,44.5) {task $t$};
+\node[model, minimum width=32mm, minimum height=8.4mm] (sim) at (17,35)
+  {\textbf{user simulator}\\[-0.35em]\tin{a language model}};
+\node[model, minimum width=32mm, minimum height=8.4mm] (agent) at (17,24)
+  {\textbf{agent}\\[-0.35em]\tin{a language model}};
+\node[envb, minimum width=32mm, minimum height=8.4mm] (env) at (17,13)
+  {\textbf{environment}\\[-0.35em]\tin{tools, database, judge}};
+
+\draw[flow]   (task) -- (sim);
+\draw[biflow] (sim)  -- (agent) node[midway, right=0.9mm, note] {messages};
+\draw[biflow] (agent)-- (env)   node[midway, right=0.9mm, note] {tool calls};
+
+\node[sub, text width=40mm] at (0,7.2) {Four stochastic components: task
+  sampling, the agent, the simulator, and the environment with its judge.
+  Existing work measures their sum, or apportions it among these four. The
+  agent\,/\,simulator pairing is varied across four configurations, always from
+  different model families.};
+
+% ======================================================================== (b)
+\node[hdr] at (47.5,57.5) {(b) an omitted serving-layer state variable};
+\node[sub, text width=48mm] at (47.5,54) {both models are served by processes
+  that carry mutable state \emph{between} requests};
+
+\node[frame, minimum width=48mm, minimum height=30mm, anchor=north west]
+  (server) at (47.5,48.5) {};
+\node[anchor=north west, text=fmInk2, font=\fontsize{6}{7}\selectfont\sffamily\bfseries]
+  at (48.8,47.7) {inference server};
+\node[anchor=north east, text=fmInk2, font=\fontsize{5}{5.8}\selectfont\sffamily]
+  at (94.2,47.5) {vLLM \textbar{} SGLang};
+
+\node[quiet, minimum width=15mm, minimum height=5.6mm] (rprev) at (56.5,41)
+  {request $k{-}1$};
+\node[quiet, minimum width=15mm, minimum height=5.6mm] (rnext) at (56.5,29)
+  {request $k$};
+\node[cachebox, minimum width=19mm, minimum height=10.5mm] (pc) at (84,35)
+  {\textbf{prefix cache}\\[-0.35em]\tin{mutable, shared,}\\[-0.5em]\tin{\emph{on by default}}};
+
+\draw[dep] (rprev.east) -| (pc.north);
+\draw[dep] (pc.south) |- (rnext.east);
+\node[note, anchor=south] at (69.5,42.0) {writes};
+\node[note, anchor=north] at (69.5,28.0) {is read by};
+
+\node[anchor=center, text=fmInk2, font=\fontsize{5.3}{6.2}\selectfont\sffamily]
+  at (72,21.8) {weights and decoding settings held fixed across replicates};
+
+\draw[dep] (sim.east)   to[out=0,in=180] (43.4,36) -- (47.1,36);
+\draw[dep] (agent.east) to[out=0,in=180] (43.4,32) -- (47.1,32);
+
+\node[sub, text width=48mm] at (47.5,16.4) {Prefix-cache residency can create a
+  cross-request state channel, so what ran \emph{before} may enter the
+  computation of what runs \emph{next}. Our experiments identify the cache flag
+  as the operative serving factor; they do not trace individual cache hits,
+  evictions or kernel changes. This component is commonly omitted from
+  evaluation-pipeline diagrams.};
+
+% ======================================================================== (c)
+\node[hdr] at (99.5,57.5) {(c) manipulation and readout};
+\node[sub, text width=38mm] at (99.5,54) {one factor changed at a time,
+  everything else pinned};
+
+\node[panel, minimum width=38mm, minimum height=18mm, anchor=north west]
+  (man) at (99.5,48.5) {};
+\node[anchor=north west, align=left, text=fmInk,
+      font=\fontsize{5.6}{7.2}\selectfont\sffamily] at (100.6,47.7)
+  {\textcolor{fmOrange}{\rule[0.1ex]{1mm}{1mm}}~\textbf{prefix cache}~~on \textbar{} off\\
+   \textcolor{fmInk2}{\rule[0.1ex]{1mm}{1mm}}~engine~~vLLM \textbar{} SGLang\\
+   \textcolor{fmInk2}{\rule[0.1ex]{1mm}{1mm}}~temperature~~A\,00 \textbar{} B\,01 \textbar{} C\,10 \textbar{} D\,11\\
+   \textcolor{fmInk2}{\rule[0.1ex]{1mm}{1mm}}~continuous batching~~on \textbar{} off\\
+   \textcolor{fmInk2}{\rule[0.1ex]{1mm}{1mm}}~serving replicas~~1 \textbar{} $N$\\
+   \textcolor{fmInk2}{\rule[0.1ex]{1mm}{1mm}}~agent\,/\,simulator pairing~~4 configs};
+
+\node[sub, text width=38mm] at (99.5,28.4) {\textbf{readout}: run each task $R$
+  times, then compare the replicate transcripts message by message};
+
+\foreach \rw/\yy in {1/19.8, 2/16.2, 3/12.6} {
+  \node[note, anchor=east, text=fmInk2] at (102.8,\yy) {$r_{\rw}$};
+  \foreach \ii in {0,...,5} {
+    \pgfmathsetmacro\xx{103.8+\ii*4.9}
+    \ifnum\ii<3
+      \draw[fill=fmBlue!18, draw=fmBlue!50, line width=0.3pt]
+        (\xx,\yy-1.3) rectangle ++(4.2,2.6);
+    \else
+      \ifnum\ii=3
+        \ifnum\rw=1 \def\fmfill{fmBlue!18} \fi
+        \ifnum\rw=2 \def\fmfill{fmOrange!35} \fi
+        \ifnum\rw=3 \def\fmfill{fmGrid!70} \fi
+        \draw[fill=\fmfill, draw=fmOrange, line width=0.5pt]
+          (\xx,\yy-1.3) rectangle ++(4.2,2.6);
+      \else
+        \draw[fill=fmGrid!35, draw=fmGrid, line width=0.3pt]
+          (\xx,\yy-1.3) rectangle ++(4.2,2.6);
+      \fi
+    \fi
+  }
+}
+\draw[fmOrange, line width=0.6pt] (118.5,21.6) -- (118.5,10.4);
+\node[note, anchor=north west, align=left, text=fmOrange, text width=17mm]
+  at (119.4,10.1) {first divergence:\\[-0.35em]index $i$, role $r$};
+
+\node[sub, text width=38mm] at (99.5,4.8) {A task is \textbf{identical} only if
+  all $R$ transcripts agree on role, text and tool call at every index; a
+  truncated prefix counts as divergence, not as missing data.};
+
+\end{tikzpicture}
+\endgroup

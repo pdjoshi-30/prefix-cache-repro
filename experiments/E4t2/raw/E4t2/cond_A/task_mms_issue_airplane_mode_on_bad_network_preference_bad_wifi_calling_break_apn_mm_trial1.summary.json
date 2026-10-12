@@ -1,0 +1,18 @@
+{
+  "run_id": "E4t2",
+  "condition": "A",
+  "task_id": "[mms_issue]airplane_mode_on|bad_network_preference|bad_wifi_calling|break_apn_mms_setting|break_app_storage_permission|data_usage_exceeded|unseat_sim_card|user_abroad_roaming_disabled_off[PERSONA:Easy]",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1305,
+  "seconds": 217.75,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": null,
+  "n_messages": 0,
+  "termination": "infrastructure_error",
+  "error": null,
+  "sim_duration": 0.0,
+  "actual_seed": 178959
+}

@@ -1,0 +1,18 @@
+{
+  "run_id": "E5b",
+  "condition": "A",
+  "task_id": "task_021",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1317,
+  "seconds": 169.88,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 32,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 161.53698075199918,
+  "actual_seed": 647656
+}

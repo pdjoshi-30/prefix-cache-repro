@@ -1,0 +1,21 @@
+{
+  "run_id": "E4a",
+  "domain": "airline",
+  "tasks": 20,
+  "trials": 3,
+  "conditions": [
+    "A"
+  ],
+  "started_utc": "2026-08-13T08:35:43Z",
+  "finished_utc": "2026-08-13T09:11:43Z",
+  "agent_model": "Qwen/Qwen3-30B-A3B",
+  "sim_model": "mistralai/Mistral-7B-Instruct-v0.3",
+  "serving": {
+    "max_num_seqs": 1,
+    "max_containers": 1,
+    "batching": "disabled"
+  },
+  "cells_collected": 60,
+  "cells_errored": 0,
+  "error_rate": 0.0
+}

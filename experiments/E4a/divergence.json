@@ -1,0 +1,19 @@
+{
+  "A": {
+    "n_tasks": 20,
+    "identical": 0,
+    "diverged": 20,
+    "divergence_rate": 1.0,
+    "first_divergence_by_role": {
+      "assistant": {
+        "n": 11,
+        "median_index": 12
+      },
+      "user": {
+        "n": 9,
+        "median_index": 1
+      }
+    },
+    "median_normalised_position": 0.125
+  }
+}

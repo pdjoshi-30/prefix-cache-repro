@@ -1,0 +1,18 @@
+{
+  "run_id": "E4r",
+  "condition": "A",
+  "task_id": "0",
+  "trial": 0,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 300,
+  "seconds": 311.94,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 31,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 305.63871457399995,
+  "actual_seed": 626729
+}

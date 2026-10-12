@@ -1,0 +1,18 @@
+{
+  "run_id": "E11_sglang_multi",
+  "condition": "A",
+  "task_id": "17",
+  "trial": 1,
+  "agent_temp": 0.0,
+  "sim_temp": 0.0,
+  "seed": 1312,
+  "seconds": 77.25,
+  "returncode": 0,
+  "transport_attempts": 1,
+  "reward": 0.0,
+  "n_messages": 31,
+  "termination": "max_steps",
+  "error": null,
+  "sim_duration": 69.56593845000009,
+  "actual_seed": 583521
+}
