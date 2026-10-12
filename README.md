@@ -203,7 +203,7 @@ python scripts/14_review_response.py
 - **Per-cell records** (`raw/**/*.summary.json`) for every arm: reward, message count,
   termination, temperatures and seed. Every **reward-level** number in the paper can be
   recomputed from them.
-- **Transcript-identity outputs** (`divergence.json`) for `E1b`, `E3ret`, `E4a` and `E4r`.
+- **Transcript-identity outputs** (`divergence.json`) for `E1b`, `E3ret` and `E4a`.
 - **Full transcripts are not released.** `04_divergence.py`, `06_matched_compare.py` and
   `13_figures.py` read `*.full.json` transcripts. To recompute transcript-level results you need
   to regenerate them with τ²-bench at the pinned commit.
